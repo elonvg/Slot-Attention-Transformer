@@ -1,7 +1,9 @@
+import os
+import random
 import torch
 import torchvision
 from dataset import CellDataset
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -184,9 +186,10 @@ def get_loaders(
         batch_size,
         train_transform,
         val_transform,
-        num_workers=4,
+        num_workers=0,
         pin_memory=True,
 ):
+
     train_dataset = CellDataset(
         image_dir = train_dir,
         mask_dir = train_mask_dir,
@@ -214,6 +217,83 @@ def get_loaders(
         pin_memory=pin_memory,
         shuffle=False,
     )
+
+    return train_loader, val_loader
+
+def get_loaders_split(
+        image_dir,
+        mask_dir,
+        val_split=0.2,
+        random_seed=3,
+        batch_size=8,
+        train_transform=None,
+        val_transform=None,
+        num_workers=0,
+        pin_memory=True,
+):
+    
+    image_filenames = sorted([
+        f for f in os.listdir(image_dir)
+        if os.path.isfile(os.path.join(image_dir, f)) and \
+            f.lower().endswith(('.tif', '.tiff', '.png', '.jpg', '.jpeg'))
+    ])
+
+    mask_filenames = sorted([
+        f for f in os.listdir(mask_dir)
+        if os.path.isfile(os.path.join(mask_dir, f)) and \
+            f.lower().endswith(('.tif', '.tiff', '.png', '.jpg', '.jpeg'))
+    ])
+
+    random.seed(random_seed)
+    random.shuffle(image_filenames)
+    random.shuffle(mask_filenames)
+
+    tot_size = len(image_filenames)
+    val_size = int(tot_size * val_split)
+    train_size = tot_size - val_size
+
+    train_img_filenames = image_filenames[:train_size]
+    val_img_filenames = image_filenames[train_size:]
+
+    train_mask_filenames = mask_filenames[:train_size]
+    val_mask_filesnames = mask_filenames[train_size:]
+
+    print(f"Total images: {tot_size}")
+    print(f"Training images: {len(train_img_filenames)}")
+    print(f"Validation images: {len(val_img_filenames)}")
+
+    train_dataset = CellDataset(
+        image_dir = image_dir,
+        image_filenames=train_img_filenames,
+        mask_dir = mask_dir,
+        mask_filenames=mask_filenames,
+        transform = train_transform
+    )
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        shuffle=True,
+    )
+
+    val_dataset = CellDataset(
+        image_dir = image_dir,
+        image_filenames=val_img_filenames,
+        mask_dir = mask_dir,
+        mask_filenames=val_img_filenames,
+        transform = val_transform
+    )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        shuffle=False,
+    )
+
 
     return train_loader, val_loader
 

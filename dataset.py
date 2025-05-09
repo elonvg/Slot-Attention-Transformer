@@ -6,9 +6,11 @@ from torch.utils.data import Dataset
 import numpy as np
 
 class CellDataset(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None):
+    def __init__(self, image_dir, image_filenames, mask_dir, mask_filenames, transform=None):
         self.image_dir = image_dir
+        self.image_filenames = image_filenames
         self.mask_dir = mask_dir
+        self.mask_filenames = mask_filenames
         self.transform = transform
         self.images = os.listdir(image_dir)
 
@@ -16,9 +18,11 @@ class CellDataset(Dataset):
         return len(self.images)
         
     def __getitem__(self, idx):
-        img_path = os.path.join(self.image_dir, self.images[idx])
+        img_name = self.image_filenames[idx]
+        img_path = os.path.join(self.image_dir, img_name)
         # Look over replace if needed
-        mask_path = os.path.join(self.mask_dir, self.images[idx].replace("t0", "man_seg0"))
+        mask_name = self.mask_filenames[idx]
+        mask_path = os.path.join(self.mask_dir, mask_name)
         # For image: look over convert "L", maybe "RBG"?
 
         # image = np.array(Image.open(img_path).convert("L"))
