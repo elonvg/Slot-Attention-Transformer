@@ -12,16 +12,20 @@ class CellDataset(Dataset):
         self.mask_dir = mask_dir
         self.mask_filenames = mask_filenames
         self.transform = transform
-        self.images = os.listdir(image_dir)
+        self.mask_map = {}
+
+        for img_name  in self.image_filenames:
+            self.mask_map[img_name] = img_name.replace("t0", "man_seg0")
+
 
     def __len__(self):
-        return len(self.images)
+        return len(self.image_filenames)
         
     def __getitem__(self, idx):
         img_name = self.image_filenames[idx]
         img_path = os.path.join(self.image_dir, img_name)
         # Look over replace if needed
-        mask_name = self.mask_filenames[idx]
+        mask_name = self.mask_map[img_name]
         mask_path = os.path.join(self.mask_dir, mask_name)
         # For image: look over convert "L", maybe "RBG"?
 

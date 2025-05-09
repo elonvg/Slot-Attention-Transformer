@@ -178,48 +178,6 @@ def load_checkpoint(checkpoint, model):
     print("=> Loading checkpoint")
     model.load_state_dict(checkpoint["state_dict"])
 
-def get_loaders(
-        train_dir,
-        train_mask_dir,
-        val_dir,
-        val_mask_dir,
-        batch_size,
-        train_transform,
-        val_transform,
-        num_workers=0,
-        pin_memory=True,
-):
-
-    train_dataset = CellDataset(
-        image_dir = train_dir,
-        mask_dir = train_mask_dir,
-        transform = train_transform
-    )
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        shuffle=True,
-    )
-
-    val_dataset = CellDataset(
-        image_dir = val_dir,
-        mask_dir = val_mask_dir,
-        transform = val_transform
-    )
-
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        shuffle=False,
-    )
-
-    return train_loader, val_loader
-
 def get_loaders_split(
         image_dir,
         mask_dir,
@@ -256,19 +214,21 @@ def get_loaders_split(
     val_img_filenames = image_filenames[train_size:]
 
     train_mask_filenames = mask_filenames[:train_size]
-    val_mask_filesnames = mask_filenames[train_size:]
+    val_mask_filenames = mask_filenames[train_size:]
 
     print(f"Total images: {tot_size}")
     print(f"Training images: {len(train_img_filenames)}")
     print(f"Validation images: {len(val_img_filenames)}")
 
     train_dataset = CellDataset(
-        image_dir = image_dir,
+        image_dir=image_dir,
         image_filenames=train_img_filenames,
-        mask_dir = mask_dir,
-        mask_filenames=mask_filenames,
-        transform = train_transform
+        mask_dir=mask_dir,
+        mask_filenames=train_mask_filenames,
+        transform=train_transform
     )
+
+    print(f"Len train_dataset = {len(train_dataset)}")
 
     train_loader = DataLoader(
         train_dataset,
@@ -279,12 +239,14 @@ def get_loaders_split(
     )
 
     val_dataset = CellDataset(
-        image_dir = image_dir,
+        image_dir=image_dir,
         image_filenames=val_img_filenames,
-        mask_dir = mask_dir,
-        mask_filenames=val_img_filenames,
-        transform = val_transform
+        mask_dir=mask_dir,
+        mask_filenames=val_mask_filenames,
+        transform=val_transform
     )
+
+    print(f"Len val_dataset = {len(val_dataset)}")
 
     val_loader = DataLoader(
         val_dataset,
