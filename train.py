@@ -10,7 +10,7 @@ from utils import (
     evaluate_fn,
     load_checkpoint,
     save_checkpoint,
-    get_loaders,
+    get_loaders_split,
     check_accuracy,
     save_predictions_as_imgs,
 )
