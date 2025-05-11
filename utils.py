@@ -56,7 +56,7 @@ def plot_results(img_batch, mask_batch, attn_maps, keep_slots, y_batch, num_imgs
         img = img.detach().cpu().numpy()
         img = np.squeeze(img, axis=0)
 
-        ax1.imshow(img, cmap='gray', vmin=0, vmax=1)        
+        ax1.imshow(img, cmap='gray')        
         ax1.set_title(f"Image {i+1}")
         ax1.axis('off')
 
@@ -73,7 +73,7 @@ def plot_results(img_batch, mask_batch, attn_maps, keep_slots, y_batch, num_imgs
 
         # --------------Overlay active slots over original image--------------
         ax3 = plt.subplot(rows, cols, rows*2 + i + 1)
-        ax3.imshow(img, cmap="gray", vmin=0, vmax=1)
+        ax3.imshow(img, cmap="gray")
 
         active_slots = 0
         for slot_i in range(num_slots):
@@ -184,8 +184,11 @@ def get_loaders_split(
         val_split=0.2,
         random_seed=3,
         batch_size=8,
-        train_transform=None,
-        val_transform=None,
+        train_image_transform=None,
+        train_mask_transform=None,
+        val_image_transform=None,
+        val_mask_transform=None,
+        crop_size=(256, 256),
         num_workers=0,
         pin_memory=True,
 ):
@@ -196,15 +199,9 @@ def get_loaders_split(
             f.lower().endswith(('.tif', '.tiff', '.png', '.jpg', '.jpeg'))
     ])
 
-    mask_filenames = sorted([
-        f for f in os.listdir(mask_dir)
-        if os.path.isfile(os.path.join(mask_dir, f)) and \
-            f.lower().endswith(('.tif', '.tiff', '.png', '.jpg', '.jpeg'))
-    ])
-
+    # Split into train and val
     random.seed(random_seed)
     random.shuffle(image_filenames)
-    random.shuffle(mask_filenames)
 
     tot_size = len(image_filenames)
     val_size = int(tot_size * val_split)
@@ -213,22 +210,20 @@ def get_loaders_split(
     train_img_filenames = image_filenames[:train_size]
     val_img_filenames = image_filenames[train_size:]
 
-    train_mask_filenames = mask_filenames[:train_size]
-    val_mask_filenames = mask_filenames[train_size:]
-
     print(f"Total images: {tot_size}")
     print(f"Training images: {len(train_img_filenames)}")
     print(f"Validation images: {len(val_img_filenames)}")
 
+    # Make loaders
     train_dataset = CellDataset(
         image_dir=image_dir,
         image_filenames=train_img_filenames,
         mask_dir=mask_dir,
-        mask_filenames=train_mask_filenames,
-        transform=train_transform
+        transform=train_image_transform,
+        mask_transform=train_mask_transform,
+        is_train=True,
+        crop_size=crop_size
     )
-
-    print(f"Len train_dataset = {len(train_dataset)}")
 
     train_loader = DataLoader(
         train_dataset,
@@ -242,11 +237,11 @@ def get_loaders_split(
         image_dir=image_dir,
         image_filenames=val_img_filenames,
         mask_dir=mask_dir,
-        mask_filenames=val_mask_filenames,
-        transform=val_transform
+        transform=val_image_transform,
+        mask_transform=val_mask_transform,
+        is_train=False,
+        crop_size=None
     )
-
-    print(f"Len val_dataset = {len(val_dataset)}")
 
     val_loader = DataLoader(
         val_dataset,
@@ -255,7 +250,6 @@ def get_loaders_split(
         pin_memory=pin_memory,
         shuffle=False,
     )
-
 
     return train_loader, val_loader
 

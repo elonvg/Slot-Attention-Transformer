@@ -74,22 +74,6 @@ def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, 
         avg_val_loss = evaluate_fn(val_loader, model, loss_fn, device)
         val_loss_list.append(avg_val_loss)
 
-        # Save model (use later)
-        # checkpoint = {
-        #     "state_dict": model.state_dict(),
-        #     "optimizer": optimizer.state_dict(),
-        # }
-        # save_checkpoint(checkpoint)
-
-
-        # Check accuracy - evaluate model using validation set
-        # check_accuracy(val_loader, model, device)
-
-        # Print examples to folder
-        # save_predictions_as_imgs(
-        #     val_loader, model, folder="saved_images/", device=DEVICE
-        # )
-
     print("Done training")
 
     plt.plot(train_loss_list, label='Training Loss')
