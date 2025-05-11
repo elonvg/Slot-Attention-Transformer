@@ -47,7 +47,7 @@ def train_fn(loader, model, optimizer, loss_fn, lambda_aux, scaler, device, epoc
         keep_aux_loss = keep_slots.sum()
         lambda_aux = 0.0001
 
-        tot_loss = tot_loss + loss.item() + lambda_aux * keep_aux_loss
+        tot_loss = tot_loss + loss.item() + lambda_aux * keep_aux_loss.item()
         num_batches += 1
 
         # Update progressbar and display loss value
