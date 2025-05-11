@@ -16,7 +16,7 @@ from utils import (
 )
 
 # Process each epoch
-def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epochs):
+def train_fn(loader, model, optimizer, loss_fn, lambda_aux, scaler, device, epoch, num_epochs):
     loop = tqdm(loader, leave=False) # Progressbar
     loop.set_description(f"Epoch [{epoch+1}/{num_epochs}]")
     tot_loss = 0
@@ -45,9 +45,9 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epoch
 
         # Auxillary loss
         keep_aux_loss = keep_slots.sum()
-        lambda_aux_loss = 0.0001
+        lambda_aux = 0.0001
 
-        tot_loss = tot_loss + loss.item()
+        tot_loss = tot_loss + loss.item() + lambda_aux * keep_aux_loss
         num_batches += 1
 
         # Update progressbar and display loss value
@@ -56,7 +56,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epoch
     avg_loss = tot_loss / num_batches
     return avg_loss
 
-def trainmodel(train_loader, val_loader, model, loss_fn, optimizer, num_epochs, device): 
+def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, num_epochs, device): 
     
     # Initialize gradient-scaler - manages scaling factor and gradient checks
     scaler = torch.amp.GradScaler() # For mixed precision training
@@ -68,7 +68,7 @@ def trainmodel(train_loader, val_loader, model, loss_fn, optimizer, num_epochs, 
     for epoch in range(num_epochs):
         
         # Call train_fn for each epoch -> one full loop over all training data
-        avg_train_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler, device, epoch, num_epochs)
+        avg_train_loss = train_fn(train_loader, model, optimizer, loss_fn, lambda_aux, scaler, device, epoch, num_epochs)
         train_loss_list.append(avg_train_loss)
 
         avg_val_loss = evaluate_fn(val_loader, model, loss_fn, device)

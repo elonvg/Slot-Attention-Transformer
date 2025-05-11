@@ -17,7 +17,7 @@ class FullModel(nn.Module):
             slot_iters,
             hidden_dim,
             temperature,
-            decoder_features,
+            decoder_features
         ):
         super().__init__()
         self.img_c = img_c
