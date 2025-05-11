@@ -34,7 +34,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epoch
         # Mixed Precision (apm = Automatic Mixed Precision)
         with torch.amp.autocast(device_type=str(device).split(":")[0]):
             # Inside this block some model operations run using float16 -> faster on certain GPUs
-            predictions, _, _ = model(data) # Standard forward pass
+            predictions, attn_maps, keep_slots = model(data) # Standard forward pass
             loss = loss_fn(predictions, data) # Calculated loss between model prediction and targets
 
         # -------------Backpropagation-------------
@@ -42,6 +42,10 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epoch
         scaler.scale(loss).backward() # Modified backward pass for mixed precision
         scaler.step(optimizer) # Optimizer step -> Update model weights
         scaler.update() # Update scale factor for next generation
+
+        # Auxillary loss
+        keep_aux_loss = keep_slots.sum()
+        lambda_aux_loss = 0.0001
 
         tot_loss = tot_loss + loss.item()
         num_batches += 1
