@@ -16,6 +16,7 @@ class FullModel(nn.Module):
             dim_head,
             slot_iters,
             hidden_dim,
+            temperature,
             decoder_features,
         ):
         super().__init__()
@@ -36,7 +37,7 @@ class FullModel(nn.Module):
         self.mh_sat = MultiHeadSlotAttention(num_slots=num_slots, dim=encoder_out_channels, heads=num_heads, dim_head=dim_head, iters=slot_iters, hidden_dim=hidden_dim)
 
         # Adaptive slot wrapper
-        self.adaptive_slot_wrapper = AdaptiveSlotWrapper(self.mh_sat, temperature=1)
+        self.adaptive_slot_wrapper = AdaptiveSlotWrapper(self.mh_sat, temperature)
 
         # CNN decoder
         self.cnn_decoder = CNNdecoder(in_channels=encoder_out_channels+2, img_c=img_c, out_size=(img_height, img_width), decoder_features=decoder_features)

@@ -16,8 +16,9 @@ from utils import (
 )
 
 # Process each epoch
-def train_fn(loader, model, optimizer, loss_fn, scaler, device):
+def train_fn(loader, model, optimizer, loss_fn, scaler, device, epoch, num_epochs):
     loop = tqdm(loader, leave=False) # Progressbar
+    loop.set_description(f"Epoch [{epoch+1}/{num_epochs}]")
     tot_loss = 0
     num_batches = 0 
     model.train()
@@ -61,10 +62,9 @@ def trainmodel(train_loader, val_loader, model, loss_fn, optimizer, num_epochs, 
 
     # Epoch loop
     for epoch in range(num_epochs):
-        print(f"Current epoch: {epoch} of {num_epochs}")
-
+        
         # Call train_fn for each epoch -> one full loop over all training data
-        avg_train_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler, device)
+        avg_train_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler, device, epoch, num_epochs)
         train_loss_list.append(avg_train_loss)
 
         avg_val_loss = evaluate_fn(val_loader, model, loss_fn, device)
