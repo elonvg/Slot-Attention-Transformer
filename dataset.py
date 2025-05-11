@@ -36,7 +36,7 @@ class CellDataset(Dataset):
         # For image: look over convert "L", maybe "RBG"?
 
         image = tifffile.imread(img_path)
-        image = (image / image.max() * 255).astype(np.uint8)
+        image = image.astype(np.uint8)
 
         mask = tifffile.imread(mask_path)
         mask = mask.astype(np.float32)
