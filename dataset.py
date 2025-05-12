@@ -43,23 +43,22 @@ class CellDataset(Dataset):
         mask[mask > 0] = 1.0 # Convert all non-zero pixels to 1 for binary segmentation
 
         # Convert to PIL
-        # image_pil = Image.fromarray(image)
+        image_pil = Image.fromarray(image)
         mask_pil = Image.fromarray((mask * 255).astype(np.uint8), mode='L')
 
         # Random crop (synchronized for images and mask)
-        # if self.is_train and self.crop_size:
-        #     # Get parameters for random crop
-        #     # self.crop_size should be (height, width)
-        #     i, j, h, w, = T.RandomCrop.get_params(image_pil, output_size=self.crop_size)
+        if self.crop_size is not None:
+            # Get parameters for random crop
+            # self.crop_size should be (height, width)
+            i, j, h, w, = T.RandomCrop.get_params(image_pil, output_size=self.crop_size)
 
-        #     # Apply random crop to both image and mask
-        #     image_pil = TF.crop(image_pil, i, j, h, w)
-        #     mask_pil = TF.crop(mask_pil, i, j, h, w)
+            # Apply random crop to both image and mask
+            image_pil = TF.crop(image_pil, i, j, h, w)
+            mask_pil = TF.crop(mask_pil, i, j, h, w)
         
         # Apply regular transform
         if self.transform is not None:
-            # image_tensor = self.transform(image_pil)
-            image_tensor = self.transform(image)
+            image_tensor = self.transform(image_pil)
             mask_tensor = self.mask_transform(mask_pil)
         else:
             # image_tensor = T.ToTensor()(image_pil)
