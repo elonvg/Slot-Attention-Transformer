@@ -76,6 +76,9 @@ def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, 
 
         scheduler.step(avg_val_loss)
 
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Current Learning Rate: {current_lr:.2e}")
+
     print("Done training")
 
     plt.plot(train_loss_list, label='Training Loss')

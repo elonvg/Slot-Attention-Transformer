@@ -41,6 +41,7 @@ class CNNdecoder(nn.Module):
             nn.Upsample(size=out_size, mode="bilinear"),
             nn.Conv2d(decoder_features[-1], img_c, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(img_c),
+            nn.ReLU()
             # nn.Sigmoid() # Linear activation
         )
         curr_channels = in_channels
