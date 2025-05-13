@@ -88,8 +88,8 @@ class FullModel(nn.Module):
 
         # Broadcast shape of x_slot (batch_size, num_slots, slot_dim) -> (batch_size, slot_dim, h_decode, w_decode) for each slot
         # Use broadcast to give slot vector spatial features
-        H_decode = self.img_height #// 8
-        W_decode = self.img_width #// 8
+        H_decode = self.img_height // 2
+        W_decode = self.img_width // 2
 
         active_slots = active_slots.view(batch_size * self.num_slots, self.slot_dim, 1, 1) # Adds spatial dimensions
         # Shape: (batch_size*num_slots, slot_dim, 1, 1)
@@ -131,8 +131,8 @@ class FullModel(nn.Module):
         attn_maps_reshape = attn_maps_unsq.view(batch_size * self.num_slots, 1, H_encoded, W_encoded)
         # Shape: (batch_size * num_slots, 1, H_encoded, W_encoded)
 
-        # attn_maps_upsampled = self.attn_upsample(attn_maps_reshape)
-        attn_maps_upsampled = attn_maps_reshape
+        attn_maps_upsampled = self.attn_upsample(attn_maps_reshape)
+        # attn_maps_upsampled = attn_maps_reshape
         # Shape: (batch_size * num_slots, 1, img_height, img_width)
 
         attn_maps_recon = attn_maps_upsampled.view(batch_size, self.num_slots, 1, self.img_height, self.img_width)
