@@ -26,6 +26,8 @@ class FullModel(nn.Module):
         self.num_slots = num_slots
         self.slot_dim = encoder_out_channels
 
+        self.sampling_num = encoder_features.count("pool")
+
 
         #CNN encoder
         self.cnn_encoder = CNNencoder(img_c=img_c, encoder_features=encoder_features, out_channels=encoder_out_channels)
@@ -88,8 +90,8 @@ class FullModel(nn.Module):
 
         # Broadcast shape of x_slot (batch_size, num_slots, slot_dim) -> (batch_size, slot_dim, h_decode, w_decode) for each slot
         # Use broadcast to give slot vector spatial features
-        H_decode = self.img_height // 2
-        W_decode = self.img_width // 2
+        H_decode = self.img_height // 2**self.sampling_num
+        W_decode = self.img_width // 2**self.sampling_num
 
         active_slots = active_slots.view(batch_size * self.num_slots, self.slot_dim, 1, 1) # Adds spatial dimensions
         # Shape: (batch_size*num_slots, slot_dim, 1, 1)
@@ -131,8 +133,10 @@ class FullModel(nn.Module):
         attn_maps_reshape = attn_maps_unsq.view(batch_size * self.num_slots, 1, H_encoded, W_encoded)
         # Shape: (batch_size * num_slots, 1, H_encoded, W_encoded)
 
-        attn_maps_upsampled = self.attn_upsample(attn_maps_reshape)
-        # attn_maps_upsampled = attn_maps_reshape
+        if self.sampling_num > 0:
+            attn_maps_upsampled = self.attn_upsample(attn_maps_reshape)
+        else:
+            attn_maps_upsampled = attn_maps_reshape
         # Shape: (batch_size * num_slots, 1, img_height, img_width)
 
         attn_maps_recon = attn_maps_upsampled.view(batch_size, self.num_slots, 1, self.img_height, self.img_width)
