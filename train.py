@@ -74,7 +74,8 @@ def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, 
         avg_val_loss = evaluate_fn(val_loader, model, loss_fn, device)
         val_loss_list.append(avg_val_loss)
 
-        scheduler.step(avg_val_loss)
+        if scheduler is not None:
+            scheduler.step()
 
     print("Done training")
 
