@@ -56,7 +56,7 @@ def train_fn(loader, model, optimizer, loss_fn, lambda_aux, scaler, device, epoc
     avg_loss = tot_loss / num_batches
     return avg_loss
 
-def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, scheduler, num_epochs, device): 
+def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, scheduler, scheduler_type, num_epochs, device): 
     
     # Initialize gradient-scaler - manages scaling factor and gradient checks
     scaler = torch.amp.GradScaler() # For mixed precision training
@@ -74,8 +74,11 @@ def trainmodel(train_loader, val_loader, model, loss_fn, lambda_aux, optimizer, 
         avg_val_loss = evaluate_fn(val_loader, model, loss_fn, device)
         val_loss_list.append(avg_val_loss)
 
-        if scheduler is not None:
+        if scheduler_type == "plateau":
             scheduler.step(avg_val_loss)
+        elif scheduler_type == "cos":
+            scheduler.step()
+            
 
     print("Done training")
 
