@@ -143,6 +143,7 @@ class FullModel(nn.Module):
         masked_recon = output_decoder * attn_maps_recon
         # Shape: (batch_size, num_slots, img_c, img_h, img_w)
 
+        # Sum over all slots for final out
         final_output = masked_recon.sum(dim=1)
         # Shape: (batch_size, img_c, img_h, img_w))
 

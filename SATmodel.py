@@ -187,7 +187,7 @@ class MultiHeadSlotAttention(nn.Module):
 #--------------------------------POS-ENCODER---------------------------------------------------------------------------------------------------
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, model_dim, p_dropout=0.1, max_len=5000):
+    def __init__(self, model_dim, p_dropout=0.1, max_len=50000):
         super().__init__()
 
         self.dropout = nn.Dropout(p=p_dropout) # Initialize dropout layer
