@@ -108,7 +108,8 @@ class FullModel(nn.Module):
         # Shape: (batch_size * num_slots, 2, H_decode, W_decode)
 
         # Concatenate with slots for final input to decoder
-        input_decoder = torch.cat((pos_grid, active_slots), dim=1)
+        # input_decoder = torch.cat((pos_grid, active_slots), dim=1)
+        input_decoder = active_slots
         # Shape: (batch_size * num_slots, slot_dim + 2, H_decode, W_decode))
 
         # -----------------------------------Decoder--------------------------------------------------------------------
