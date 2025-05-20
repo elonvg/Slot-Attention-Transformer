@@ -55,6 +55,7 @@ class FullModel(nn.Module):
         # -----------------------------------Encoder--------------------------------------------------------
         
         x_cnn = self.cnn_encoder(x)
+        # Shape: (batch_size, encoder_out_channels, h_encoded, w_encoded)
 
         # Reshape output from encoder to fit into slot-attention model
         batch_size, encoder_out_channels, H_encoded, W_encoded = x_cnn.shape
