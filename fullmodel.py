@@ -42,7 +42,7 @@ class FullModel(nn.Module):
         self.adaptive_slot_wrapper = AdaptiveSlotWrapper(self.mh_sat, temperature)
 
         # CNN decoder                                               +2
-        self.cnn_decoder = CNNdecoder(in_channels=encoder_out_channels+2, img_c=img_c, out_size=(img_height, img_width), decoder_features=decoder_features)
+        self.cnn_decoder = CNNdecoder(in_channels=encoder_out_channels, img_c=img_c, out_size=(img_height, img_width), decoder_features=decoder_features)
 
         # Attention upsampler
         self.attn_upsample = nn.Upsample(size=(self.img_height, self.img_width), mode="bilinear", align_corners=False)
