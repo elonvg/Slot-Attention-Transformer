@@ -15,13 +15,13 @@ class CNNencoder(nn.Module):
                 self.encoder.append(nn.MaxPool2d(kernel_size=2, stride=2))
             else:
                 feature_dim = item
-                self.encoder.append(nn.Conv2d(curr_channels, feature_dim, kernel_size=3, stride=1, padding=1, bias=False))
+                self.encoder.append(nn.Conv2d(curr_channels, feature_dim, kernel_size=3, stride=1, padding=1, padding_mode="reflect", bias=False))
                 self.encoder.append(nn.BatchNorm2d(feature_dim))
                 self.encoder.append(nn.ReLU())
                 curr_channels = feature_dim
         
         # Final layer
-        self.encoder.append(nn.Conv2d(curr_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False))
+        self.encoder.append(nn.Conv2d(curr_channels, out_channels, kernel_size=3, stride=1, padding=1, padding_mode="reflect", bias=False))
         self.encoder.append(nn.BatchNorm2d(out_channels))
         self.encoder.append(nn.ReLU())
 
