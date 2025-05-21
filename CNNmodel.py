@@ -39,7 +39,7 @@ class CNNdecoder(nn.Module):
         self.decoder = nn.Sequential()
         self.final_layer = nn.Sequential(
             # nn.Upsample(size=out_size, mode="bilinear"),
-            nn.Conv2d(decoder_features[-1], img_c, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(decoder_features[-1], img_c, kernel_size=3, stride=1, padding=1, padding_mode="reflect", bias=False),
             nn.BatchNorm2d(img_c),
             nn.ReLU()
             # nn.Sigmoid() # Linear activation
@@ -52,7 +52,7 @@ class CNNdecoder(nn.Module):
                 self.decoder.append(nn.Upsample(scale_factor=2, mode="bilinear"))
             else:
                 feature_dim = item
-                self.decoder.append(nn.Conv2d(curr_channels, feature_dim, kernel_size=3, stride=1, padding=1, bias=False))
+                self.decoder.append(nn.Conv2d(curr_channels, feature_dim, kernel_size=3, stride=1, padding=1, padding_mode="reflect", bias=False))
                 self.decoder.append(nn.BatchNorm2d(feature_dim))
                 self.decoder.append(nn.ReLU())
                 curr_channels = feature_dim
